@@ -50,7 +50,7 @@
 - The `dig` tool in linux can be used to inspect the entire resolution process.
 
 #figure(
-  caption: [DNS Resolution],
+  caption: [DNS resolution],
   image("assets/dns_lookup_iterative.png", height: 18em),
 )
 
@@ -71,7 +71,7 @@
 - For example: To create a new hostname for our department, say _dcss.visvabharati.ac.in_, we only need to contact our university IT department and not the registrar of _in_.
 
 #figure(
-  caption: [DNS Namespace],
+  caption: [DNS namespace],
   image("assets/dns_namespace.png", height: 18em),
 )
 
@@ -151,6 +151,10 @@
 
 == Name Resolution
 
+#figure(
+  caption: [Recursive name resolution],
+  image("assets/dns_lookup_recursive.png", height: 17em),
+)
 
 == References
 
