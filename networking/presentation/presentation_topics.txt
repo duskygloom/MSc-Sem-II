@@ -1,0 +1,10 @@
+Networking Presentation Topics
+------------------------------
+
+Topic 1: Post NewReno TCP variants
+Topic 2: TCP timers, implications and implementation
+Topic 3: IPv6 addressing and enhancements over IPv4
+Topic 4: Static and dynamic DNS (cloudflare, noIP and nginx) // reverse proxy
+Topic 5: VoIP
+Topic 6: Real-time streaming over IP
+Topic 7: IPv6 routing (RIPv6 and OSPFv6)

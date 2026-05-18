@@ -1,0 +1,9 @@
+[project]
+name = "presentation"
+version = "0.1.0"
+description = "DNS and proxy presentation"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "touying>=0.14.4",
+]
