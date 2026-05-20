@@ -1,5 +1,7 @@
+import touying
+
 def main():
-    print("Hello from presentation!")
+    touying.to_pptx(input="main.typ")
 
 
 if __name__ == "__main__":
