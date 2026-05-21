@@ -1,0 +1,15 @@
+#include "stdio.h"
+
+#define PI 3.14
+
+/**
+ * @description
+ * Returns the area of a circle with radius `radius`.
+ */
+float calculateArea(float radius) { return PI * radius * radius; }
+
+int main() {
+  char end /* end printf with this */ = '\n';
+  double radius = 4.0; // radius in cm
+  printf("Area: %lf%c", calculateArea(radius), end);
+}
