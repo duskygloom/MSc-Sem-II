@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"bufio"
+	"io"
 )
 
 /* A BASE AUTOMATA FUNCTION
@@ -16,7 +17,9 @@ func getGeneric(reader *bufio.Reader) Token {
 
 	for !finalState {
 		ch, err := reader.ReadByte()
-		if err != nil {
+		if err == io.EOF {
+			finalState = true // end normally during EOF
+		} else if err != nil {
 			return NewToken(T_FAILURE, err.Error())
 		}
 

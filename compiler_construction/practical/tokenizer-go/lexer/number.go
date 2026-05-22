@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"bufio"
+	"io"
 )
 
 func getNumber(reader *bufio.Reader) Token {
@@ -12,7 +13,9 @@ func getNumber(reader *bufio.Reader) Token {
 
 	for !finalState {
 		ch, err := reader.ReadByte()
-		if err != nil {
+		if err == io.EOF {
+			finalState = true // end normally during EOF
+		} else if err != nil {
 			return NewToken(T_FAILURE, err.Error())
 		}
 
