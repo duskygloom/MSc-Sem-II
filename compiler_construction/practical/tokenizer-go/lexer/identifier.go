@@ -14,6 +14,7 @@ func getIdentifier(reader *bufio.Reader) Token {
 	for !finalState {
 		ch, err := reader.ReadByte()
 		if err == io.EOF {
+			reader.UnreadByte()
 			finalState = true // end normally during EOF
 		} else if err != nil {
 			return NewToken(T_FAILURE, err.Error())
