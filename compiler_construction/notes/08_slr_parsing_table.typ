@@ -14,6 +14,72 @@
 #line(length: 100%)
 #v(2em)
 
+== Items
+#line()
+- An LR(0) item or item of a grammar $G$ is a production with a $dot$(dot) at some position of the body. Thus, the production $A -> X Y Z$ yields the four items:
+  #grid(
+    rows: 2,
+    columns: 2,
+    row-gutter: 0.8em,
+    column-gutter: 2em,
+    [$A -> dot X Y Z$], [$A -> X dot Y Z$],
+    [$A -> X Y dot Z$], [$A -> X Y Z dot$],
+    [],
+  )
+- Intuitively, an item indicates how much of a production we have seen at a given point in the parsing process. For example:
+  - $A -> dot X Y Z$ indicates that we hope to see a string derivable from $X Y Z$ next on the input.
+  - $A -> X dot Y Z$ indicates that we have just seen on the input a string derivable from $X$ and that we hope to see a string derivable from $Y Z$.
+  - $A -> X Y Z dot$ indicates that we have already seen a string derivable from $X Y Z$ and that maybe it is time to reduce by $A$.
+#v(1em)
+
+== Canonical LR(0) collection
+#line()
+
+- One collection of sets of LR(0) items, which we call the canonical LR(0) collection, provides the basic for constructing SLR parsers.
+- To construct LR(0) collection for a grammar, we define an augmented grammar and two functions $"CLOSURE"$ and $"GOTO"$.
+#v(1em)
+
+== Augmented grammar
+#line()
+
+- If $G$ is a grammar with start symbol $S$, then $G$, the augmented grammar for $G$ is $G$ with a start symbol $S'$ and the production $S' -> S$.
+- The purpose of this new starting production is to indicate to the parser when it should stop parsing and announce acceptance of the input.
+- The acceptance occurs when and only when the parser is about to reduce by $S' -> S$.
+#v(1em)
+
+== CLOSURE operation
+#line()
+
+- If $I$ is the set of items for a grammar $G$, then $"CLOSURE"(I)$ is the set of items constructed from $I$ by the following two rules:
+  + Initially, every item $I$ is added to $"CLOSURE"(I)$.
+  + If $A -> alpha dot B beta$ is in $"CLOSURE"(I)$ and $B -> gamma$ is a production, then add the item $B -> dot gamma$ to $"CLOSURE"(I)$ if it is not already there. We apply this rule until no more new items can be added to $"CLOSURE"(I)$.
+- Intuitively, $A -> alpha dot B beta$ in $"CLOSURE"(I)$ indicates that, at some point in the parsing process, we think we might next see a substring derivable from $B beta$ as input.
+- As an example, for a grammar with the following production rules:
+  #grid(
+    columns: 2,
+    row-gutter: 0.8em,
+    column-gutter: 2em,
+    [$E' -> E$], [$E -> E + T | T$],
+    [$T -> T * F | F$], [$F -> (E) | "id"$],
+  )
+  If $I$ is a set of one item ${[E' -> dot E]}$, then $"CLOSURE"(I)$ contains the items:
+  #grid(
+    columns: 2,
+    row-gutter: 0.8em,
+    column-gutter: 2em,
+    [$E' -> dot E$], [$E -> dot E + T$],
+    [$E -> dot T$], [$T -> dot T * F$],
+    [$T -> dot F$], [$F -> dot (E)$],
+    [$F -> dot "id"$],
+  )
+  #v(1em)
+
+== GOTO operation
+#line()
+- $"GOTO"(I, X)$ is defined to be the closure of the set of all items $[A -> alpha X dot beta]$ such that $[A -> alpha dot X beta]$ is in $I$, where $I$ is a set of items and $X$ is a grammar symbol.
+- Intuitively, the $"GOTO"$ function is used to define the transitions in the LR(0) automaton for a grammar.
+#v(1em)
+
 == Construction of SLR parsing table
 #line()
 *Input:* An augmented grammar $G'$.\
@@ -30,3 +96,157 @@
   If $"GOTO"[I_i, A] = I_j$, then $"GOTO"[i, A] = j$.
 + All entries not defined by rules 2 and 3 are made $"ERROR"$.
 + The initial state of the parser is the one constructed from the set of items containing [$S' -> dot S$].
+#v(1em)
+
+== Example 1
+Create SLR parsing table for a grammar with thet following production rules:
+#grid(
+  columns: 2,
+  row-gutter: 0.8em,
+  column-gutter: 2em,
+  [$E' -> dot E$], [$E -> dot E + T$],
+  [$E -> dot T$], [$T -> dot T * F$],
+  [$T -> dot F$], [$F -> dot (E)$],
+  [$F -> dot "id"$],
+)
+
+#figure(caption: [Collection of sets of LR(0) items], grid(
+  columns: (1fr,) * 4,
+  column-gutter: 0.5em,
+  row-gutter: 0.5em,
+
+  grid(
+    row-gutter: 0.5em,
+    align(center, rect(width: 100%, grid(
+      row-gutter: 0.8em,
+      [*$ I_0 $*],
+      $
+        E' & -> dot E \
+         E & -> dot E + T \
+         E & -> dot T \
+         T & -> dot T * F \
+         T & -> dot F \
+         F & -> dot (E) \
+         F & -> dot "id"
+      $,
+    ))),
+    align(center, rect(width: 100%, grid(
+      row-gutter: 0.8em,
+      [*$ I_1 = I_0 . E $*],
+      $
+        E' & -> E dot \
+         E & -> E dot "" + T
+      $,
+    ))),
+  ),
+
+  grid(
+    row-gutter: 0.5em,
+    align(center, rect(width: 100%, grid(
+      row-gutter: 0.8em,
+      [*$ I_2 = I_0 . T $*],
+      $
+        E & -> T dot \
+        T & -> T dot * F
+      $,
+    ))),
+
+    align(center, rect(width: 100%, grid(
+      row-gutter: 0.8em,
+      [*$ I_3 = I_0 . F $*],
+      $
+        T & -> F dot
+      $,
+    ))),
+
+    align(center, rect(width: 100%, grid(
+      row-gutter: 0.8em,
+      [*$ I_4 = I_0 . ( "" $*],
+      $
+        F & -> ( dot E ) \
+        E & -> dot E + T \
+        E & -> dot T \
+        T & -> dot T * F \
+        T & -> dot F \
+        F & -> dot (E) \
+        F & -> "id"
+      $,
+    ))),
+  ),
+
+  grid(
+    row-gutter: 0.5em,
+    align(center, rect(width: 100%, grid(
+      row-gutter: 0.8em,
+      [*$ I_5 = I_0 . "id" $*],
+      $
+        F & -> "id" dot
+      $,
+    ))),
+
+    align(center, rect(width: 100%, grid(
+      row-gutter: 0.8em,
+      [*$ I_6 = I_0 . E $*],
+      $
+        E & -> E + dot T \
+        T & -> dot T * F \
+        T & -> dot F \
+        F & -> dot (E) \
+        F & -> dot "id"
+      $,
+    ))),
+
+    align(center, rect(width: 100%, grid(
+      row-gutter: 0.8em,
+      [*$ I_7 = I_2 . * $*],
+      $
+        T & -> T * dot F \
+        F & -> dot (E) \
+        F & -> dot "id"
+      $,
+    ))),
+  ),
+
+  grid(
+    row-gutter: 0.5em,
+    align(center, rect(width: 100%, grid(
+      row-gutter: 0.8em,
+      [*$ I_8 = I_4 . E $*],
+      $
+        F & -> ( E dot ) \
+        E & -> E dot "" + T \
+        F & -> dot "id"
+      $,
+    ))),
+
+    align(center, rect(width: 100%, grid(
+      row-gutter: 0.8em,
+      [*$ I_9 = I_6 . T $*],
+      $
+        E & -> E + T dot \
+        T & -> T dot * F
+      $,
+    ))),
+
+    align(center, rect(width: 100%, grid(
+      row-gutter: 0.8em,
+      [*$ I_(10) = I_7 . F $*],
+      $
+        T & -> T * F dot
+      $,
+    ))),
+
+    align(center, rect(width: 100%, grid(
+      row-gutter: 0.8em,
+      [*$ I_(11) = I_8 .) $*],
+      $
+        F & -> ( E ) dot
+      $,
+    ))),
+  ),
+))
+
+#figure(
+  caption: [LR(0) automata],
+  image("assets/slr_automata.png", width: 100%),
+)
