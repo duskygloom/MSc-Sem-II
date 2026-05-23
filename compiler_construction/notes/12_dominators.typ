@@ -13,116 +13,147 @@
 #line(length: 100%)
 #v(2em)
 
-== Dominators
-#figure(image("assets/flow_graph.png", height: 25em), caption: [Flow graph])
-- We say node $d$ of a flow graph dominates node $n$ (written as $d "DOM" n$), if every path from the initial node to the flow graph to $n$ goes through $d$.
-- In the above example:
-  - The initial node dominates every node.
-  - Node 2 dominates only itself.
-  - Node 3 dominates all but 1 and 2.
-  - Node 4 dominates all but 1, 2 and 3.
-  - Node 5 and 3 dominate only themselves.
-  - Node 7 dominates 7, 8, 9 and 10.
-  - Node 8 dominates 8, 9 and 10.
-  - Node 9 and 10 dominate only themselves.
-- Dominance is reflexive, i.e. $a "DOM" a$ holds.
-- Dominance is also transitive, i.e. $a "DOM" b and b "DOM" c => a "DOM" c$.
-- Dominance is anti-symmetric, i.e. $a "DOM" b and b "DOM" a => a = b$
-- Dominance is a reflexive partial order. The dominance of each node are heirarchically ordered by DOM relation.
-- E.g. The dominators of 9 are 1, 3, 4, 7, 8 and 9. It can be found that $1 "DOM" 3 "DOM" 4 "DOM" 7 "DOM" 8 "DOM" 9$. 8 is called the immediate dominator of 9.
-
+#figure(
+  caption: [Flow graph of example 2 of basic blocks],
+  image("assets/quick_sort_flow_graph.png", height: 10em),
+)
 #v(1em)
-== Back edges
-- We can search for edges in the flow graph whose heads dominate their tails. If $A -> B$ is an edge, $B$ is the head and $A$ is the tail. We call such edges - back edges.
-- Example: There is an edge $7 -> 4$ and $4 "DOM" 7$. Similarly, $10 -> 7$ is an edge and $7 "DOM" 10$. Note that these are exactly the edges that can be seen as forming loop in the flow graph.
 
-#v(1em)
-== Natural loops
-- Given a back edge $n -> d$, we define the natural loop of the edge to be $d + "set of nodes that can reach" n "without going through" d$, node $d$ is the header of the loop.
-- Example: The natural loop containing 7, 8 and 10 since 8 and 10 are all those nodes that cannot reach 10 without going through 7. The natural loop of $9 -> 1$ is the entire flow graph.
-
-#v(1em)
-== Reducible flow graph
-- A flow graph is reducible if and only if we can partition the edges into two disjoint groups often called the forward edges and back edges with the following two properties:
-  + The forward edges form an acyclic graph in which every node can be reached from the initial node of $G$.
-  + The back edges consist only of edges whose heads dominate their tails.
-
-#v(1em)
 == Data flow analysis
+#line()
 - It is a process of collecting information about the variables that are used in the program.
 - The information collected at various points can be related using simple set equations.
 - A typical equation has the form:
   $ "out"[s] = "gen"[s] union ("in"[s] - "kill"[s]) $
   and can be read as _the information at the end of a statement is either generated within the statement or enters at the beginning of the statement and is not killed as control flows through the statement_.
 
-#v(1em)
-== Points
-- By a point in a program, we mean the position before or after any statement. We say control reaches the point just before a statement when the statement is about to be executed and the point after when the statement has been executed.
+=== Point
+- By a _point_ in a program, we mean the position before or after any statement. We say control reaches the _point before_ a statement when the statement is about to be executed and the _point after_ when the statement has been executed.
 
-#v(1em)
-== Paths
+=== Path
 - A path from $p_1$ to $p_n$ is a sequence of points $p_1, p_2, ..., p_n$ such that for each $i$ between $1$ and $n-1$ either:
   #[
     #set enum(numbering: "i.")
-    + $p_i$ is the point immediately preceding a statement and $p_(i+1)$ is the point immediately following the statement in the same block.
-    + $p_i$ is the end of some block and $p_(i+1)$ is the beginning of the successor block.
+    + $p_i$ is the point immediately preceding a statement and $p_(i+1)$ is the point immediately following the statement in the same block. In this case, the _point after_ a statement $s$ is the same as the _point before_ the statement $s+1$.
+    + $p_i$ is the end of some block and $p_(i+1)$ is the beginning of the successor block. In this case, the _point after_ the final statement of a block is followed by the _point before_ the first statement of the successor block.
   ]
 
-#v(1em)
-== Define
-- A definition of a variable $x$ is a statement that assigns or may assign a value to $x$.
+=== Definition
+- A _definition_ of a variable $x$ is a statement that assigns or may assign a value to $x$.
 
-#v(1em)
-== Reach
-- A definition $d$ is said to reach a point $p$ if there is a path from the point immediately following $d$ to $p$ such that $d$ is not _killed_ along the path.
+=== Reach
+- A definition $d$ is said to _reach_ a point $p$ if there is a path from the point immediately following $d$ to $p$ such that $d$ is not _killed_ along the path.
 
-#v(1em)
-== Kill
-- We kill a definition of a variable $a$ if between two points along the path there is a definition of $a$
+=== Kill
+- We _kill_ a definition of a variable $a$ if between two points, along the path there is another definition of $a$.
 
-#v(1em)
-== Gen[s]
-- We define $"gen"[s]$ as a set of definitions generated by $s$.
-- We say definition $d$ is in $"gen"[s]$ if $d$ reaches the end of $s$ independent of whether it reaches the beginning of $s$, i.e. $d$ must appear in $s$ and reach the end of $s$ via a path that does not go outside $s$.
+=== Gen[s]
+- We define $"gen"[s]$ as the set of _definitions_ generated by statement $s$.
+- We say _definition_ $d$ is in $"gen"[s]$ if $d$ reaches the end of $s$ independent of whether it reaches the beginning of $s$.
+- Another defintion of $"gen"[s]$ could be: _definition_ $d$ is in $"gen"[s]$ if $d$ is not _killed_ by another subsequent _defintion_ in the same block, and is thus "visible" at the end of the block.
 
-#v(1em)
-== Kill[s]
-- We say $"kill"[s]$ is a set of definitions that never reaches the end of $s$ even if they reach the beginning, i.e. in order for definition $d$ to be in $"kill"[s]$, every path from the beginning to the end of $s$ must have an unambiguous definition of the same variable defined by $d$ and if $d$ appears in $s$, then following every occurrence of $d$ along any path must be another definition of the same variable.
+=== Kill[s]
+- We say $"kill"[s]$ is the set of definitions that never reaches the end of $s$ even if they reach the beginning.
 
-  #figure(
+- #figure(
     caption: [Definition of a statement],
     image("assets/definition.png", height: 10em),
   )
 
-- The assignment is a definition of $a$, say defintion $d$. Then $d$ is the only definition sure to reach the end of the statement regardless of whether it reaches the beginning.
+  The assignment is a definition of $a$, say defintion $d$. Then $d$ is the only definition sure to reach the end of the statement regardless of whether it reaches the beginning.
   $ "gen"[s] = {d} $
   $d$ kills all other definitions, so we write
   $ "kill"[s] = D_a - {d} $
   where $D_a$ is the set of all definitions in the program for variable $a$.
 
-  #figure(
+- #figure(
     caption: [Definition of consecutive statements],
     image("assets/consecutive_statements.png", height: 14em),
   )
 
-- We next consider a consecutive set of statements $s_1$ and $s_2$. Consider the definition $d$, if it is generated by $s_2$ then it is surely generated by $s$. If $d$ is generated by $s_1$, it will reach the end of $s$ provided it is not killed by $s_2$. Then we write:
+  We next consider a consecutive set of statements $s_1$ and $s_2$. Consider the definition $d$, if it is generated by $s_2$ then it is surely generated by $s$. If $d$ is generated by $s_1$, it will reach the end of $s$ provided it is not killed by $s_2$. Then we write:
   $
      "gen"[s] & = "gen"[s_2] union ("gen"[s_1] - "kill"[s_2]) \
     "kill"[s] & = "kill"[s_2] union ("kill"[s_1] - "gen"[s_2])
   $
 
-  #figure(
+- #figure(
     caption: [Definition of _if_ statement],
     image("assets/if_statement.png", height: 10em),
   )
 
-- For the if statment, if either branch of the if generates a statement, then that definition reaches the end of the statemnt. Thus, to kill definition $d$, it must be killed along either branch so that
+  For the _if_ statment, if either branch of the _if_ generates a statement, then that definition reaches the end of the statemnt. Thus, to kill definition $d$, it must be killed along either branch so that
   $
      "gen"[s] & = "gen"[s_1] union "gen"[s_2] \
     "kill"[s] & = "kill"[s_1] inter "kill"[s_2]
   $
 
-- If defintion $d$ is generated wuntin $s_1$, then it reaches both the end of $s_1$ and $s$. Conversely, if $d$ is generated within $s$, it can be generated within $s_1$. We conclude
+- If defintion $d$ is generated within $s_1$, then it reaches both the end of $s_1$ and $s$. Conversely, if $d$ is generated within $s$, it can be generated within $s_1$. We conclude
   $ "gen"[s] = "gen"[s_1] $
   by a similar set of arguments, we can say
   $ "kill"[s] = "kill"[s_1] $
+
+#figure(
+  caption: [Flow graph for reaching definitions],
+  image("assets/reaching_definitions.png", width: 32em),
+)
+
+#v(1em)
+#pagebreak()
+
+== Dominators
+#line()
+
+#figure(image("assets/flow_graph.png", height: 14em), caption: [Flow graph])
+- We say node $d$ of a flow graph dominates node $n$ (written as $d "DOM" n$), if every path from the initial node to the flow graph to $n$ goes through $d$.
+- In the above example:
+  - The initial node dominates every node.
+  - Node 2 dominates only itself.
+  - Node 3 dominates all but 1 and 2.
+  - Node 4 dominates all but 1, 2 and 3.
+  - Node 5 and 6 dominate only themselves.
+  - Node 7 dominates 7, 8, 9 and 10.
+  - Node 8 dominates 8, 9 and 10.
+  - Node 9 and 10 dominate only themselves.
+- Dominance is reflexive, i.e. $a "DOM" a$ holds.
+- Dominance is also transitive, i.e. $a "DOM" b "and" b "DOM" c => a "DOM" c$.
+- Dominance is anti-symmetric, i.e. $a "DOM" b "and" b "DOM" a => a = b$
+- Dominance is a reflexive partial order. The dominance of each node are heirarchically ordered by DOM relation.
+- E.g. The dominators of 9 are 1, 3, 4, 7, 8 and 9. It can be found that $1 "DOM" 3 "DOM" 4 "DOM" 7 "DOM" 8 "DOM" 9$. 8 is called the immediate dominator of 9.
+
+=== Back edges
+- We can search for edges in the flow graph whose heads dominate their tails. If $A -> B$ is an edge, $B$ is the head and $A$ is the tail. We call such edges - back edges.
+- Example: There is an edge $7 -> 4$ and $4 "DOM" 7$. Similarly, $10 -> 7$ is an edge and $7 "DOM" 10$. Note that these are exactly the edges that can be seen as forming loop in the flow graph.
+
+=== Natural loops
+- Given a back edge $n -> d$, we define the natural loop of the edge to be $d$ plus the set of nodes that can reach $n$ without going through $d$. Node $d$ is called the _header_ of the loop.
+- Example: The natural loop containing 7, 8 and 10 since 8 and 10 are all those nodes that can reach 10 without going through 7. The natural loop of $9 -> 1$ is the entire flow graph.
+
+=== Depth-First Spanning Tree (DFST)
+#figure(image("assets/depth_first_spanning_tree.png", height: 14em), caption: [Depth-first spanning tree])
+- A depth-first search of a graph visits all nodes in the graph once. The route of a depth-first search forms a _depth-first spanning tree_.
+- There are three types of edges in a DFST:
+  + *Advancing edges:* Edges that go from a node to any of its descendent are called _advancing edges_. All the edges represented by solid arrows are _advancing edges_.
+  + *Retreating edges:* Edges that go from a node to itself or any of its ancestors are called _retreating edges_. All the edges represented by dashed arrows except $6 -> 7$ are _retreating edges_.
+  + *Cross edges:* Edges that connect two nodes which do not follow an ancestor-descendent relationship are called _cross edges_. $6 -> 7$ is a _cross edge_.
+
+=== Reducible flow graph
+- A flow graph is _reducible_ if the _retreating edges_ in any DFST are all _back edges_. For example, the retreating edges in $"Figure" 7$ are:
+  $ 4->3 " | " 7->4 " | " 8->1 " | " 9->1 " | " 10->7 $
+  which are all _back edges_.
+- All back edges are _retreating edges_, but if a flow graph is _nonreducible_, its DFST has additional _retreating edges_ that are not _back edges_, i.e. even if we remove all the _back edges_ of a _nonreducible_ flow graph, the graph will still be cyclic.
+- Alternatively, a flow graph is _reducible_ if and only if we can partition the edges into two disjoint groups often called the forward edges and back edges with the following two properties:
+  + The forward edges form an acyclic graph in which every node can be reached from the initial node of $G$ (basically, $"advancing edges" union "cross edges"$ forms a directed acyclic graph).
+  + The back edges consist only of edges whose heads dominate their tails (basically, $"retreating edges" = "back edges"$).
+- Consider the following flow graph. $3 -> 2$ is _retreating edge_, but it is not a _back edge_. Alternatively, it has no back edges, but it still contains a cycle. So, this is a _nonreducible_ flow graph.
+  #grid(
+    columns: (1fr, 1fr),
+    figure(
+      caption: [A _nonreducible_ flow graph],
+      image("assets/non_reducible.png", height: 8em),
+    ),
+    figure(
+      caption: [Corresponding DFST],
+      image("assets/non_reducible_dfst.png", height: 8em),
+    ),
+  )
