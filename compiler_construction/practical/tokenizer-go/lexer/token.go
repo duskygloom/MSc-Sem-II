@@ -6,6 +6,7 @@ type TokenType int
 
 const (
 	T_IDEN TokenType = iota
+	T_KEYWORD
 	T_INT
 	T_FLOAT
 
@@ -39,6 +40,7 @@ const (
 
 var tokenValues = []string{
 	"IDENTIFIER",
+	"KEYWORD",
 	"INTEGER",
 	"FLOAT",
 
