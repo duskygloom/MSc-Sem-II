@@ -12,7 +12,15 @@ const (
 
 	T_HASH
 	T_LESSER
+	T_LESSEQ
+	T_LSHIFT
 	T_GREATER
+	T_GREATEQ
+	T_RSHIFT
+	T_ASSIGN
+	T_EQUAL
+	T_NOT
+	T_NOTEQUAL
 	T_PLUS
 	T_MINUS
 	T_STAR
@@ -34,6 +42,7 @@ const (
 	T_CHAR
 	T_STRING
 	T_COMMENT
+	T_SEMICOLON
 	T_EOF
 	T_FAILURE
 )
@@ -46,7 +55,15 @@ var tokenValues = []string{
 
 	"HASH",
 	"LESSER",
+	"LESSEQ",
+	"LSHIFT",
 	"GREATER",
+	"GREATEQ",
+	"RSHIFT",
+	"ASSIGN",
+	"EQUAL",
+	"NOT",
+	"NOTEQUAL",
 	"PLUS",
 	"MINUS",
 	"STAR",
@@ -68,6 +85,7 @@ var tokenValues = []string{
 	"CHAR",
 	"STRING",
 	"COMMENT",
+	"SEMICOLON",
 	"EOF",
 	"FAILURE",
 }

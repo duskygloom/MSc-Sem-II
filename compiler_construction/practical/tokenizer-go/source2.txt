@@ -1,0 +1,19 @@
+void search(n) {
+	mark n "visited";
+	for (each successor s of n) {
+		if (s is "unvisited") {
+			add edge n->s to T;
+			search(s);
+		}
+	dfn[n] = c;
+	c = c-1;
+	}
+}
+
+main() {
+	T = phi; /* set of edges */
+	for (each node n of G)
+		mark n "unvisited";
+	c = number of nodes of G;
+	search(n0);
+}

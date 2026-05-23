@@ -17,14 +17,33 @@ func NextToken(reader *bufio.Reader) Token {
 	if err != nil {
 		return NewToken(T_FAILURE, err.Error())
 	}
-
 	switch ch {
 	case '#':
 		return NewToken(T_HASH, "")
 	case '<':
-		return NewToken(T_LESSER, "")
+		err := reader.UnreadByte()
+		if err != nil {
+			return NewToken(T_FAILURE, err.Error())
+		}
+		return getLesser(reader)
 	case '>':
-		return NewToken(T_GREATER, "")
+		err := reader.UnreadByte()
+		if err != nil {
+			return NewToken(T_FAILURE, err.Error())
+		}
+		return getGreater(reader)
+	case '=':
+		err := reader.UnreadByte()
+		if err != nil {
+			return NewToken(T_FAILURE, err.Error())
+		}
+		return getAssign(reader)
+	case '!':
+		err := reader.UnreadByte()
+		if err != nil {
+			return NewToken(T_FAILURE, err.Error())
+		}
+		return getNot(reader)
 	case '+':
 		return NewToken(T_PLUS, "")
 	case '-':
@@ -65,6 +84,8 @@ func NextToken(reader *bufio.Reader) Token {
 			return NewToken(T_FAILURE, err.Error())
 		}
 		return getChar(reader)
+	case ';':
+		return NewToken(T_SEMICOLON, "")
 	default:
 		if isAlpha(ch) {
 			// detect identifier
