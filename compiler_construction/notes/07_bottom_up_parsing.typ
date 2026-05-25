@@ -44,9 +44,9 @@
 == Handle pruning
 #line()
 - We start with the string of terminals $w$ that we wish to parse.
-- If $w$ is a sentence of the grammar at hand, then $w = gamma n$ where $gamma n$ is the $n^"th"$ right sentential form of some as yet unknown right-most derivation.
+- If $w$ is a sentence of the grammar at hand, then $w = gamma_n$ where $gamma_n$ is the $n^"th"$ right sentential form of some as yet unknown right-most derivation.
   $ S = gamma_0 => gamma_1 => gamma_2 ... => gamma_n = w $
-- To reconstruct this derivation in reverse order, we locate the handle $beta n$ in $gamma n$ and replace $beta n$ with the left side of some production $A_n -> beta_n$ to obtain the $n-1^"th"$ right sentential form $gamma_(n-1)$.
+- To reconstruct this derivation in reverse order, we locate the handle $beta_n$ in $gamma_n$ and replace $beta_n$ with the left side of some production $A_n -> beta_n$ to obtain the $n-1^"th"$ right sentential form $gamma_(n-1)$.
 - We then repeat this procedure and if by continuing this we produce a right sentential form consisting only of the start symbol $S$, then we halt and announce successful completion of parsing. The reverse of the sequence of productions used in the reduction is the right-most derivation of the input string.
 - For example, consider a grammar with the following production rules:
   $
@@ -60,7 +60,7 @@
     table(
       columns: (1fr, 1fr, 1fr),
       table.header(
-        align(center)[*Right sequential form*], align(center)[*Handle*], align(center)[*Reduction production*]
+        align(center)[*Right sentential form*], align(center)[*Handle*], align(center)[*Reduction production*]
       ),
       [$"id"_1 + "id"_2 * "id"_3$], [$"id"_1$], [$E -> "id"$],
       [$E + "id"_2 * "id"_3$], [$"id"_2$], [$E -> "id"$],
