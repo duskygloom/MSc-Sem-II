@@ -14,6 +14,10 @@
 #line(length: 100%)
 #v(2em)
 
+== Simple LR
+#line()
+- The Simple LR or SLR method is the weakest method to construct an LR parsing table from a grammar. We shall refer to the parsing table constructed by the method as an _SLR table_, and to an LR parser using an SLR-parsing table as an _SLR parser_.
+
 == Items
 #line()
 - An LR(0) item or item of a grammar $G$ is a production with a $dot$(dot) at some position of the body. Thus, the production $A -> X Y Z$ yields the four items:
@@ -56,21 +60,17 @@
 - Intuitively, $A -> alpha dot B beta$ in $"CLOSURE"(I)$ indicates that, at some point in the parsing process, we think we might next see a substring derivable from $B beta$ as input.
 - As an example, for a grammar with the following production rules:
   #grid(
-    columns: 2,
+    columns: (10em,) * 2,
     row-gutter: 0.8em,
-    column-gutter: 2em,
     [$E' -> E$], [$E -> E + T | T$],
     [$T -> T * F | F$], [$F -> (E) | "id"$],
   )
   If $I$ is a set of one item ${[E' -> dot E]}$, then $"CLOSURE"(I)$ contains the items:
   #grid(
-    columns: 2,
+    columns: (10em,) * 4,
     row-gutter: 0.8em,
-    column-gutter: 2em,
-    [$E' -> dot E$], [$E -> dot E + T$],
-    [$E -> dot T$], [$T -> dot T * F$],
-    [$T -> dot F$], [$F -> dot (E)$],
-    [$F -> dot "id"$],
+    [$E' -> dot E$], [$E -> dot E + T$], [$E -> dot T$], [$T -> dot T * F$],
+    [$T -> dot F$], [$F -> dot (E)$], [$F -> dot "id"$],
   )
   #v(1em)
 
@@ -99,15 +99,12 @@
 #v(1em)
 
 == Example 1
-Create SLR parsing table for a grammar with thet following production rules:
+Create SLR parsing table for a grammar with the following production rules:
 #grid(
-  columns: 2,
+  columns: (10em,) * 4,
   row-gutter: 0.8em,
-  column-gutter: 2em,
-  [$E' -> dot E$], [$E -> dot E + T$],
-  [$E -> dot T$], [$T -> dot T * F$],
-  [$T -> dot F$], [$F -> dot (E)$],
-  [$F -> dot "id"$],
+  [$E' -> dot E$], [$E -> dot E + T$], [$E -> dot T$], [$T -> dot T * F$],
+  [$T -> dot F$], [$F -> dot (E)$], [$F -> dot "id"$],
 )
 
 #figure(caption: [Cannonical LR(0) collection], grid(
