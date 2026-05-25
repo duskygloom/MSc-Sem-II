@@ -59,17 +59,17 @@ Partitioning a sequence of three-address statements into basic blocks.
 begin
   prod = 0
   i = 1
-  do begin
-    prod = prod + a \* b
+  begin
+    prod = prod + a * b
     i = i + 1
-  end
-  while i <= 20
+  do while i <= 20
 end
 ```
+#pagebreak()
 
 *Three-address code:*
 #grid(
-  columns: 2,
+  columns: (1fr, 1fr),
   column-gutter: 2em,
   ```
   1. prod = 0 // leader by rule 1
@@ -175,7 +175,7 @@ So, the basic blocks are:
     ))
 
 + *Dead code elimination*
-  - Suppose $x$ is dead, i.e. never subsequently used at the point where the statement $x= y(z)$ appears in a basic block.
+  - Suppose $x$ is dead, i.e. never subsequently used at the point where the statement $x= y "op" z$ appears in a basic block.
 
 + *Renaming temporary variables*
   - Example:
